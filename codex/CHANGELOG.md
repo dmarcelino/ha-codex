@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.11] - 2026-09-25
+
+### Changed
+- Point App repository, image, and image labels at `dmarcelino/ha-codex` and publish images to `ghcr.io/dmarcelino/ha-codex`.
+
 ## [0.4.10] - 2026-09-25
 
 ### Fixed

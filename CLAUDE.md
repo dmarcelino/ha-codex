@@ -47,7 +47,7 @@ Follow the existing changelog format:
 - Do **not** reintroduce `codex/build.yaml`. Home Assistant's current BuildKit guidance makes the Dockerfile the build source of truth; legacy `build.yaml` support is transitional and scheduled for removal.
 - Use the generic multi-architecture Home Assistant base image where possible.
 - Use the composable `home-assistant/builder/actions/*` BuildKit actions, not the retired legacy `home-assistant/builder` action.
-- Published images use the generic multi-architecture reference `ghcr.io/canetlotw/ha-codex:<version>`.
+- Published images use the generic multi-architecture reference `ghcr.io/dmarcelino/ha-codex:<version>`.
 - Keep `io.hass.type=app` metadata current.
 - Supported architectures are `amd64` and `aarch64`.
 

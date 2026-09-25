@@ -15,7 +15,7 @@ env:
   ARCHITECTURES: '["amd64", "aarch64"]'
   IMAGE_NAME: ha-codex
   # GitHub preserves account-name casing, but OCI repository names must be lowercase.
-  REGISTRY_PREFIX: ghcr.io/canetlotw
+  REGISTRY_PREFIX: ghcr.io/dmarcelino
 
 permissions:
   contents: read

@@ -6,13 +6,13 @@ ARG BUILD_ARCH
 ARG CODEX_VERSION=0.153.4
 ARG TTYD_VERSION=1.7.7
 
-LABEL maintainer="CaneTLOTW"
+LABEL maintainer="dmarcelino"
 LABEL io.hass.version="${BUILD_VERSION}"
 LABEL io.hass.type="app"
 LABEL io.hass.arch="${BUILD_ARCH}"
 LABEL org.opencontainers.image.title="Codex App for Home Assistant"
 LABEL org.opencontainers.image.description="OpenAI Codex App for the Home Assistant sidebar with terminal access, model controls, and optional MCP integration"
-LABEL org.opencontainers.image.source="https://github.com/CaneTLOTW/ha-codex"
+LABEL org.opencontainers.image.source="https://github.com/dmarcelino/ha-codex"
 LABEL org.opencontainers.image.licenses="MIT"
 
 ENV \

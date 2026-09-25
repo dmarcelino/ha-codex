@@ -1,9 +1,9 @@
 name: Codex
 description: OpenAI Codex App for Home Assistant with terminal access, model controls, and optional Home Assistant MCP integration
-version: "0.4.10"
+version: "0.4.11"
 slug: codex
-url: https://github.com/CaneTLOTW/ha-codex
-image: ghcr.io/canetlotw/ha-codex
+url: https://github.com/dmarcelino/ha-codex
+image: ghcr.io/dmarcelino/ha-codex
 arch:
   - amd64
   - aarch64

@@ -12,7 +12,7 @@ on:
 env:
   ARCHITECTURES: '["amd64", "aarch64"]'
   IMAGE_NAME: ha-codex
-  REGISTRY_PREFIX: ghcr.io/canetlotw
+  REGISTRY_PREFIX: ghcr.io/dmarcelino
 
 permissions:
   contents: read
