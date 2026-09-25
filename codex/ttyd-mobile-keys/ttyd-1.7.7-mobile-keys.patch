@@ -1,5 +1,5 @@
 diff --git a/html/src/components/terminal/index.tsx b/html/src/components/terminal/index.tsx
-index b42bf15..4647c7f 100644
+index b42bf15..0b6f9e1 100644
 --- a/html/src/components/terminal/index.tsx
 +++ b/html/src/components/terminal/index.tsx
 @@ -11,30 +11,188 @@ interface Props extends XtermOptions {
@@ -476,7 +476,7 @@ index b42bf15..4647c7f 100644
      showModal() {
          this.setState({ modal: true });
 diff --git a/html/src/components/terminal/xterm/index.ts b/html/src/components/terminal/xterm/index.ts
-index b643f92..47391b5 100644
+index b643f92..56dcd87 100644
 --- a/html/src/components/terminal/xterm/index.ts
 +++ b/html/src/components/terminal/xterm/index.ts
 @@ -74,6 +74,33 @@ function addEventListener(target: EventTarget, type: string, listener: EventList
@@ -513,15 +513,16 @@ index b643f92..47391b5 100644
  export class Xterm {
      private disposables: IDisposable[] = [];
      private textEncoder = new TextEncoder();
-@@ -82,6 +109,7 @@ export class Xterm {
+@@ -82,6 +109,8 @@ export class Xterm {
      private pending = 0;
  
      private terminal: Terminal;
 +    private desktopSelectionActive = false;
++    private lastPointerType?: string;
      private fitAddon = new FitAddon();
      private overlayAddon = new OverlayAddon();
      private webglAddon?: WebglAddon;
-@@ -96,13 +124,21 @@ export class Xterm {
+@@ -96,13 +125,21 @@ export class Xterm {
      private resizeOverlay = true;
      private reconnect = true;
      private doReconnect = true;
@@ -545,7 +546,7 @@ index b643f92..47391b5 100644
  
      dispose() {
          for (const d of this.disposables) {
-@@ -111,6 +147,14 @@ export class Xterm {
+@@ -111,6 +148,14 @@ export class Xterm {
          this.disposables.length = 0;
      }
  
@@ -560,7 +561,7 @@ index b643f92..47391b5 100644
      @bind
      private register<T extends IDisposable>(d: T): T {
          this.disposables.push(d);
-@@ -122,6 +166,35 @@ export class Xterm {
+@@ -122,6 +167,35 @@ export class Xterm {
          this.zmodemAddon?.sendFile(files);
      }
  
@@ -596,7 +597,7 @@ index b643f92..47391b5 100644
      @bind
      public async refreshToken() {
          try {
-@@ -149,6 +222,8 @@ export class Xterm {
+@@ -149,6 +223,8 @@ export class Xterm {
      @bind
      public open(parent: HTMLElement) {
          this.terminal = new Terminal(this.options.termOptions);
@@ -605,15 +606,38 @@ index b643f92..47391b5 100644
          const { terminal, fitAddon, overlayAddon } = this;
          window.term = terminal as TtydTerminal;
          window.term.fit = () => {
-@@ -160,9 +235,154 @@ export class Xterm {
+@@ -160,9 +236,177 @@ export class Xterm {
          terminal.loadAddon(new WebLinksAddon());
  
          terminal.open(parent);
 +        this.installNativeTouchSelection();
 +        this.installDesktopSelectionPreference();
++        this.installCopyShortcut();
          fitAddon.fit();
      }
  
++    /**
++     * Ctrl+Shift+C copies the current terminal selection. Chrome otherwise
++     * treats the shortcut as "inspect element" and opens DevTools, and plain
++     * Ctrl+C must keep reaching the terminal as an interrupt.
++     */
++    private installCopyShortcut() {
++        this.terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
++            if (event.type !== 'keydown') return true;
++            if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey) return true;
++            if (event.code !== 'KeyC') return true;
++            if (!this.terminal.hasSelection()) return true;
++            event.preventDefault();
++            try {
++                document.execCommand('copy');
++            } catch {
++                return false;
++            }
++            this.overlayAddon?.showOverlay('\u2702', 200);
++            return false;
++        });
++    }
++
 +    /**
 +     * Backport the mouse arbitration added upstream as xterm's
 +     * `mouseEventsRequireAlt` option. ttyd 1.7.7 is pinned to xterm 5.x, so we
@@ -621,22 +645,19 @@ index b643f92..47391b5 100644
 +     * xterm's existing forced-selection gesture. Wheel events are untouched and
 +     * continue to the application/tmux. Holding Alt leaves application mouse
 +     * interaction untouched as well.
++     *
++     * The decision is made per gesture from the pointer type rather than from
++     * device capabilities: touchscreen laptops report touch points and a coarse
++     * primary pointer while still being driven by a mouse. Only gestures that
++     * originate from a touch pointer are left to the touch/mobile path.
 +     */
 +    private installDesktopSelectionPreference() {
 +        const element = this.terminal.element;
 +        if (!element) return;
 +
-+        const navigator = window.navigator as Navigator & {
-+            maxTouchPoints?: number;
-+            userAgentData?: { mobile?: boolean };
++        const onPointerDown = (event: Event) => {
++            this.lastPointerType = (event as PointerEvent).pointerType;
 +        };
-+        const touchPoints = navigator.maxTouchPoints ?? 0;
-+        const mobilePlatform =
-+            /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '') ||
-+            (navigator.platform === 'MacIntel' && touchPoints > 1) ||
-+            navigator.userAgentData?.mobile === true;
-+        const coarsePrimaryPointer = window.matchMedia?.('(hover: none) and (pointer: coarse)').matches === true;
-+        if (touchPoints > 0 && (mobilePlatform || coarsePrimaryPointer)) return;
 +
 +        const forceSelectionModifier = (event: MouseEvent) => {
 +            if (event.altKey || event.shiftKey) return;
@@ -653,6 +674,7 @@ index b643f92..47391b5 100644
 +        const onMouseDown = (event: Event) => {
 +            const mouseEvent = event as MouseEvent;
 +            if (mouseEvent.button !== 0 || mouseEvent.altKey) return;
++            if (this.lastPointerType === 'touch') return;
 +            this.desktopSelectionActive = true;
 +            forceSelectionModifier(mouseEvent);
 +        };
@@ -669,12 +691,14 @@ index b643f92..47391b5 100644
 +            this.desktopSelectionActive = false;
 +        };
 +
++        element.addEventListener('pointerdown', onPointerDown, true);
 +        element.addEventListener('mousedown', onMouseDown, true);
 +        document.addEventListener('mousemove', onMouseMove, true);
 +        document.addEventListener('mouseup', onMouseUp, true);
 +        window.addEventListener('blur', onBlur, true);
 +        this.register(
 +            toDisposable(() => {
++                element.removeEventListener('pointerdown', onPointerDown, true);
 +                element.removeEventListener('mousedown', onMouseDown, true);
 +                document.removeEventListener('mousemove', onMouseMove, true);
 +                document.removeEventListener('mouseup', onMouseUp, true);
@@ -760,7 +784,7 @@ index b643f92..47391b5 100644
      @bind
      private initListeners() {
          const { terminal, fitAddon, overlayAddon, register, sendData } = this;
-@@ -173,7 +393,7 @@ export class Xterm {
+@@ -173,7 +417,7 @@ export class Xterm {
                  }
              })
          );
@@ -769,7 +793,7 @@ index b643f92..47391b5 100644
          register(terminal.onBinary(data => sendData(Uint8Array.from(data, v => v.charCodeAt(0)))));
          register(
              terminal.onResize(({ cols, rows }) => {
-@@ -223,7 +443,10 @@ export class Xterm {
+@@ -223,7 +467,10 @@ export class Xterm {
      @bind
      public sendData(data: string | Uint8Array) {
          const { socket, textEncoder } = this;
@@ -781,7 +805,7 @@ index b643f92..47391b5 100644
  
          if (typeof data === 'string') {
              const payload = new Uint8Array(data.length * 3 + 1);
-@@ -238,6 +461,15 @@ export class Xterm {
+@@ -238,6 +485,15 @@ export class Xterm {
          }
      }
  
@@ -797,7 +821,7 @@ index b643f92..47391b5 100644
      @bind
      public connect() {
          this.socket = new WebSocket(this.options.wsUrl, ['tty']);
-@@ -253,6 +485,7 @@ export class Xterm {
+@@ -253,6 +509,7 @@ export class Xterm {
      @bind
      private onSocketOpen() {
          console.log('[ttyd] websocket connection opened');
@@ -805,7 +829,7 @@ index b643f92..47391b5 100644
  
          const { textEncoder, terminal, overlayAddon } = this;
          const msg = JSON.stringify({ AuthToken: this.token, columns: terminal.cols, rows: terminal.rows });
-@@ -274,6 +507,7 @@ export class Xterm {
+@@ -274,6 +531,7 @@ export class Xterm {
      @bind
      private onSocketClose(event: CloseEvent) {
          console.log(`[ttyd] websocket connection closed with code: ${event.code}`);
@@ -813,7 +837,7 @@ index b643f92..47391b5 100644
  
          const { refreshToken, connect, doReconnect, overlayAddon } = this;
          overlayAddon.showOverlay('Connection Closed');
-@@ -289,8 +523,7 @@ export class Xterm {
+@@ -289,8 +547,7 @@ export class Xterm {
                  const event = e.domEvent;
                  if (event.key === 'Enter') {
                      keyDispose.dispose();
@@ -823,7 +847,7 @@ index b643f92..47391b5 100644
                  }
              });
              overlayAddon.showOverlay('Press ⏎ to Reconnect');
-@@ -379,7 +612,8 @@ export class Xterm {
+@@ -379,7 +636,8 @@ export class Xterm {
          for (const [key, value] of Object.entries(prefs)) {
              switch (key) {
                  case 'rendererType':

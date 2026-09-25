@@ -111,7 +111,7 @@ Desktop and mobile deliberately use different interaction paths. A narrow deskto
 | --- | --- | --- |
 | Input | Physical keyboard and normal ttyd/xterm controls | Two-row touch toolbar plus the iOS software keyboard |
 | Selection | Mouse drag | `Sel` mode, then native long-press/drag selection |
-| Copy/Paste | Browser/OS context menu and normal terminal shortcuts | Native iOS Copy/Paste while `Sel` is active |
+| Copy/Paste | `Ctrl+Shift+C` / `Ctrl+Shift+V`, or the browser/OS context menu | Native iOS Copy/Paste while `Sel` is active |
 | Scrolling | Mouse wheel / terminal history | With `Sel` off: vertical swipe, handled stepwise rather than as live drag-scrolling. `PgUp` / `PgDn` also work while `Sel` is active. |
 | Software keyboard | Not applicable | `Kbd↑` shows it and `Kbd↓` hides it |
 | Keyboard avoidance | Not active | Terminal automatically moves/resizes above the software keyboard |

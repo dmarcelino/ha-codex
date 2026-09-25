@@ -34,7 +34,7 @@ The maintained ttyd frontend deliberately uses separate desktop and touch/mobile
 | --- | --- | --- |
 | Terminal controls | Normal physical keyboard and ttyd/xterm interaction | Fixed two-row touch toolbar plus the software keyboard |
 | Text selection | Normal mouse drag selection | Enable `Sel`, then long-press/drag with native iOS selection handles |
-| Copy / Paste | Native browser/context-menu and normal terminal shortcuts | Native iOS Copy/Paste while `Sel` is active |
+| Copy / Paste | `Ctrl+Shift+C` / `Ctrl+Shift+V`, or the native browser/context menu | Native iOS Copy/Paste while `Sel` is active |
 | Scrolling | Mouse wheel / normal terminal history | With `Sel` off: stepwise vertical swipe. `PgUp` / `PgDn` also work while `Sel` is active. |
 | Software keyboard | Not applicable | `Kbd↑` shows it, `Kbd↓` hides it |
 | Keyboard opening | No mobile viewport handling | Terminal automatically shortens so the active prompt remains above the keyboard |

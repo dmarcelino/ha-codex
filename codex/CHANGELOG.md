@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.10] - 2026-09-25
+
+### Fixed
+- Decide desktop plain left-drag selection per gesture from the pointer type instead of device capabilities, so touchscreen laptops driven by a mouse no longer lose the selection to Codex mouse reporting.
+
+### Added
+- `Ctrl+Shift+C` copies the current terminal selection on desktop instead of opening the Chrome DevTools inspector.
+
 ## [0.4.9] - 2026-09-05
 
 ### Changed
