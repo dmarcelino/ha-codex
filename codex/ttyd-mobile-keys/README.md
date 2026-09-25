@@ -65,9 +65,16 @@ path and the accepted desktop mouse-selection backport described below.
 Desktop remains intentionally separate from the touch/mobile path. Wheel input
 continues to scroll terminal/tmux history. Plain left-drag is decorated as
 xterm's forced-selection gesture; holding Alt leaves application mouse handling
-untouched. tmux right-click bindings are removed while the browser/Windows
-context menu remains available. Multi-screen-page selection scrolling is an
-accepted limitation and is not replaced by a custom selection engine.
+untouched. The decision is made per gesture from the `pointerdown` pointer
+type: only gestures that originate from a touch pointer are left to the
+touch/mobile path, so a touchscreen laptop driven by a mouse still gets the
+desktop selection behavior even though it reports touch points and a coarse
+primary pointer. `Ctrl+Shift+C` copies the current selection and consumes the
+key so Chrome does not open its DevTools inspector; plain `Ctrl+C` still reaches
+the terminal as an interrupt. tmux right-click bindings are removed while the
+browser/Windows context menu remains available. Multi-screen-page selection
+scrolling is an accepted limitation and is not replaced by a custom selection
+engine.
 
 ## Touch-only mobile activation
 
