@@ -86,7 +86,7 @@ Accepted behavior includes:
 - tmux right-click menu is removed while normal browser/OS right-click remains;
 - tmux mouse remains enabled;
 - `MouseDown3Pane` and `M-MouseDown3Pane` are unbound;
-- plain left-drag follows the accepted forced-selection behavior, wheel handling stays untouched, and Alt preserves application mouse behavior;
+- plain left-drag follows the accepted forced-selection behavior only while application mouse tracking is on, wheel handling stays untouched, and Alt preserves application mouse behavior;
 - unreliable selection scrolling over multiple screen pages is an accepted limitation.
 
 Do not introduce a new Desktop selection engine or unrelated Desktop workaround during Mobile development.
