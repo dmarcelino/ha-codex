@@ -69,6 +69,40 @@ untouched. tmux right-click bindings are removed while the browser/Windows
 context menu remains available. Multi-screen-page selection scrolling is an
 accepted limitation and is not replaced by a custom selection engine.
 
+Two rules decide whether a left-drag is decorated:
+
+- The decision is per gesture, from the `pointerdown` pointer type. Only
+  gestures that originate from a touch pointer are left to the touch/mobile
+  path, so a touchscreen laptop driven by a mouse still gets desktop selection
+  even though it reports touch points and a coarse primary pointer.
+- The decoration is applied only while `terminal.modes.mouseTrackingMode` is
+  not `none`. Forcing Shift is the override for application mouse tracking;
+  without tracking xterm treats Shift+click as "extend the current selection",
+  so a decorated plain drag selects nothing.
+
+### Reproducing desktop selection behavior locally
+
+The 0.4.10 regression was reproduced and the 0.4.13 fix verified with a small
+headless-Chromium harness rather than on-device only. The shape is simple to
+rebuild in a scratch directory when selection behavior changes again:
+
+1. Extract clean ttyd 1.7.7, apply the canonical patch, run `yarn inline` and
+   keep `html/dist/inline.html` per variant under test.
+2. Serve that file with a mock ttyd server (Node `ws`): answer `/token` with
+   `{"token":""}`, accept the `tty` subprotocol, treat the first client message
+   as the auth JSON, then send binary frames `2` + JSON client preferences and
+   `0` + text output. Append `\x1b[?1000h\x1b[?1002h\x1b[?1006h` to the output
+   to emulate Codex/tmux mouse tracking, or omit it for the tracking-off case.
+   Log `0`-prefixed input from the client to see mouse reports reaching the app.
+3. Drive it with Playwright Chromium in two profiles: plain desktop, and
+   touchscreen laptop (`hasTouch: true` plus CDP `Emulation.setEmulatedMedia`
+   with `pointer: coarse` and `hover: none`). Perform plain, Shift and Alt
+   drags with `page.mouse` and read `window.term.getSelection()` after each.
+
+Expected: plain drag selects in both profiles whether tracking is on or off;
+Shift+drag selects while tracking is on; Alt+drag sends reports to the app
+while tracking is on and selects normally when it is off.
+
 ## Touch-only mobile activation
 
 The mobile keybar, touch swipe handlers, mobile viewport wrapper, native
