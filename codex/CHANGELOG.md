@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.17] - 2026-09-26
+
+### Fixed
+- Desktop plain left-drag selection is decided per gesture from the pointer type, so touchscreen laptops driven by a mouse get the desktop selection path instead of losing the drag to application mouse reporting.
+- The forced-Shift selection decoration is applied only while the application has mouse tracking enabled. Without tracking, xterm reads Shift+drag as "extend selection", which selected nothing.
+
 ## [0.4.16] - 2026-09-26
 
 ### Changed
