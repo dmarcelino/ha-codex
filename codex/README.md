@@ -77,7 +77,7 @@ Desktop and touch/mobile interaction are intentionally isolated from each other.
 | --- | --- | --- |
 | Input | Physical keyboard and standard ttyd/xterm input | iOS software keyboard plus fixed touch controls |
 | Selection | Plain left-drag uses xterm/browser selection | Turn on `Sel`, then use native long-press/drag selection |
-| Copy/Paste | `Ctrl+Shift+C` / `Ctrl+Shift+V`, or the native browser/OS context menu | Native iOS Copy/Paste while `Sel` is active |
+| Copy/Paste | Native browser/OS context menu and standard terminal shortcuts | Native iOS Copy/Paste while `Sel` is active |
 | History | Mouse wheel / terminal scrollback | With `Sel` off: stepwise vertical swipe. `PgUp` / `PgDn` remain available even while `Sel` is active. |
 | Mouse/application input | Normal desktop path; Alt can leave application mouse handling untouched | Not used for the touch toolbar path |
 | Context menu | Browser/Windows context menu remains available | Native iOS selection callout while `Sel` is active |

@@ -81,7 +81,7 @@ Accepted behavior includes:
 
 - mouse wheel scrolls terminal history/output;
 - plain text selection works without Shift;
-- selection can be copied, including with `Ctrl+Shift+C`;
+- selection can be copied;
 - `Ctrl+Shift+V` paste works;
 - tmux right-click menu is removed while normal browser/OS right-click remains;
 - tmux mouse remains enabled;

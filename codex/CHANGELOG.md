@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.12] - 2026-09-26
+
+### Fixed
+- Revert the 0.4.10 desktop selection and `Ctrl+Shift+C` changes: on touchscreen laptops they disabled xterm mouse selection entirely. Restores the 0.4.9 terminal frontend.
+
 ## [0.4.11] - 2026-09-25
 
 ### Changed
